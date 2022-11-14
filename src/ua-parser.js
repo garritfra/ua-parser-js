@@ -30,6 +30,9 @@
         TYPE        = 'type',
         VENDOR      = 'vendor',
         VERSION     = 'version',
+        CAPABILITIES= 'capabilities',
+        SOFTWARE    = 'software',
+        HARDWARE    = 'hardware',
         ARCHITECTURE= 'architecture',
         CONSOLE     = 'console',
         MOBILE      = 'mobile',
@@ -52,10 +55,14 @@
         LG      = 'LG',
         MICROSOFT = 'Microsoft',
         MOTOROLA  = 'Motorola',
+        NETRANGE= 'Netrange',
+        NETTV   = 'NetTV',
         OPERA   = 'Opera',
+        PANASONIC = 'Panasonic',
         SAMSUNG = 'Samsung',
         SHARP   = 'Sharp',
         SONY    = 'Sony',
+        VIERA   = 'Viera',
         XIAOMI  = 'Xiaomi',
         ZEBRA   = 'Zebra',
         FACEBOOK   = 'Facebook';
@@ -295,6 +302,8 @@
 
             / wv\).+(chrome)\/([\w\.]+)/i                                       // Chrome WebView
             ], [[NAME, CHROME+' WebView'], VERSION], [
+            /Panasonic;(VIERA)/i                                                // Panasonic Viera
+            ], [[NAME, VIERA]], [
 
             /droid.+ version\/([\w\.]+)\b.+(?:mobile safari|safari)/i           // Android Browser
             ], [VERSION, [NAME, 'Android '+BROWSER]], [
@@ -366,6 +375,37 @@
         ],
 
         device : [[
+
+            ///////////////////
+            // SMARTTVS
+            ///////////////////
+
+            /smart-tv.+(samsung)/i                                              // Samsung
+            ], [VENDOR, [TYPE, SMARTTV]], [
+            /hbbtv.+maple;(\d+)/i
+            ], [[MODEL, /^/, 'SmartTV'], [VENDOR, SAMSUNG], [TYPE, SMARTTV]], [
+            /(nux; netcast.+smarttv|lg (netcast\.tv-201\d|android tv))/i        // LG SmartTV
+            ], [[VENDOR, LG], [TYPE, SMARTTV]], [
+            /(apple) ?tv/i                                                      // Apple TV
+            ], [VENDOR, [MODEL, APPLE+' TV'], [TYPE, SMARTTV]], [
+            /crkey/i                                                            // Google Chromecast
+            ], [[MODEL, CHROME+'cast'], [VENDOR, GOOGLE], [TYPE, SMARTTV]], [
+            /droid.+aft(\w)( bui|\))/i                                          // Fire TV
+            ], [MODEL, [VENDOR, AMAZON], [TYPE, SMARTTV]], [
+            /\(dtv[\);].+(aquos)/i,
+            /(aquos-tv[\w ]+)\)/i                                               // Sharp
+            ], [MODEL, [VENDOR, SHARP], [TYPE, SMARTTV]],[
+            /(bravia[\w ]+)( bui|\))/i                                              // Sony
+            ], [MODEL, [VENDOR, SONY], [TYPE, SMARTTV]], [
+            /(mitv-\w{5}) bui/i                                                 // Xiaomi
+            ], [MODEL, [VENDOR, XIAOMI], [TYPE, SMARTTV]], [
+            /Hbbtv.*(technisat) (.*);/i                                         // TechniSAT
+            ], [VENDOR, MODEL, [TYPE, SMARTTV]], [
+            /\b(roku)[\dx]*[\)\/]((?:dvp-)?[\d\.]*)/i,                          // Roku
+            /hbbtv\/\d+\.\d+\.\d+ +\([\w\+ ]*; *([\w\d][^;]*);([^;]*)/i         // HbbTV devices
+            ], [[VENDOR, trim], [MODEL, trim], [TYPE, SMARTTV]], [
+            /\b(android tv|smart[- ]?tv|opera tv|tv; rv:)\b/i                   // SmartTV from Unidentified Vendors
+            ], [[TYPE, SMARTTV]], [
 
             //////////////////////////
             // MOBILES & TABLETS
@@ -602,35 +642,6 @@
             ], [MODEL, [VENDOR, MICROSOFT], [TYPE, CONSOLE]], [
 
             ///////////////////
-            // SMARTTVS
-            ///////////////////
-
-            /smart-tv.+(samsung)/i                                              // Samsung
-            ], [VENDOR, [TYPE, SMARTTV]], [
-            /hbbtv.+maple;(\d+)/i
-            ], [[MODEL, /^/, 'SmartTV'], [VENDOR, SAMSUNG], [TYPE, SMARTTV]], [
-            /(nux; netcast.+smarttv|lg (netcast\.tv-201\d|android tv))/i        // LG SmartTV
-            ], [[VENDOR, LG], [TYPE, SMARTTV]], [
-            /(apple) ?tv/i                                                      // Apple TV
-            ], [VENDOR, [MODEL, APPLE+' TV'], [TYPE, SMARTTV]], [
-            /crkey/i                                                            // Google Chromecast
-            ], [[MODEL, CHROME+'cast'], [VENDOR, GOOGLE], [TYPE, SMARTTV]], [
-            /droid.+aft(\w)( bui|\))/i                                          // Fire TV
-            ], [MODEL, [VENDOR, AMAZON], [TYPE, SMARTTV]], [
-            /\(dtv[\);].+(aquos)/i,
-            /(aquos-tv[\w ]+)\)/i                                               // Sharp
-            ], [MODEL, [VENDOR, SHARP], [TYPE, SMARTTV]],[
-            /(bravia[\w ]+)( bui|\))/i                                              // Sony
-            ], [MODEL, [VENDOR, SONY], [TYPE, SMARTTV]], [
-            /(mitv-\w{5}) bui/i                                                 // Xiaomi
-            ], [MODEL, [VENDOR, XIAOMI], [TYPE, SMARTTV]], [
-            /\b(roku)[\dx]*[\)\/]((?:dvp-)?[\d\.]*)/i,                          // Roku
-            /hbbtv\/\d+\.\d+\.\d+ +\([\w ]*; *(\w[^;]*);([^;]*)/i               // HbbTV devices
-            ], [[VENDOR, trim], [MODEL, trim], [TYPE, SMARTTV]], [
-            /\b(android tv|smart[- ]?tv|opera tv|tv; rv:)\b/i                   // SmartTV from Unidentified Vendors
-            ], [[TYPE, SMARTTV]], [
-
-            ///////////////////
             // WEARABLES
             ///////////////////
 
@@ -729,9 +740,19 @@
             /(cros) [\w]+ ([\w\.]+\w)/i                                         // Chromium OS
             ], [[NAME, 'Chromium OS'], VERSION],[
 
+            // Smart TVs
+            /Panasonic;VIERA/i                                                  // Panasonic Viera
+            ], [[NAME, VIERA]], [
+            /NETRANGEMMH/i                                                      // Netrange
+            ], [[NAME, NETRANGE]], [
+            /nettv\/(\d\.\d.\d)/i                                               // NetTV
+            ], [VERSION, [NAME, NETTV]], [
+
+
             // Console
             /(nintendo|playstation) ([wids345portablevuch]+)/i,                 // Nintendo/Playstation
             /(xbox); +xbox ([^\);]+)/i,                                         // Microsoft Xbox (360, One, X, S, Series X, Series S)
+
 
             // Other
             /\b(joli|palm)\b ?(?:os)?\/?([\w\.]*)/i,                            // Joli/Palm
@@ -751,6 +772,10 @@
             /\b(beos|os\/2|amigaos|morphos|openvms|fuchsia|hp-ux)/i,            // BeOS/OS2/AmigaOS/MorphOS/OpenVMS/Fuchsia/HP-UX
             /(unix) ?([\w\.]*)/i                                                // UNIX
             ], [NAME, VERSION]
+        ],
+        hbbtv : [[
+            /hbbtv\/(\d+\.\d+\.\d*) +\(([^;]*); *([^;]*); *([^;]*); *([^;]*); *([^;]*)/i      // HbbTV directive
+            ], [VERSION, CAPABILITIES, [VENDOR, trim], [MODEL, trim], [SOFTWARE, trim], [HARDWARE, trim], [TYPE, SMARTTV]]
         ]
     };
 
@@ -801,6 +826,16 @@
             rgxMapper.call(_engine, _ua, _rgxmap.engine);
             return _engine;
         };
+        this.getHbbtv = function () {
+            var _hbbtv = {};
+            _hbbtv[VERSION] = undefined;
+            _hbbtv[VENDOR] = undefined;
+            _hbbtv[MODEL] = undefined;
+            _hbbtv[SOFTWARE] = undefined;
+            _hbbtv[HARDWARE] = undefined;
+            rgxMapper.call(_hbbtv, _ua, _rgxmap.hbbtv);
+            return _hbbtv;
+        };
         this.getOS = function () {
             var _os = {};
             _os[NAME] = undefined;
@@ -813,6 +848,7 @@
                 ua      : this.getUA(),
                 browser : this.getBrowser(),
                 engine  : this.getEngine(),
+                hbbtv   : this.getHbbtv(),
                 os      : this.getOS(),
                 device  : this.getDevice(),
                 cpu     : this.getCPU()
@@ -834,6 +870,7 @@
     UAParser.CPU = enumerize([ARCHITECTURE]);
     UAParser.DEVICE = enumerize([MODEL, VENDOR, TYPE, CONSOLE, MOBILE, SMARTTV, TABLET, WEARABLE, EMBEDDED]);
     UAParser.ENGINE = UAParser.OS = enumerize([NAME, VERSION]);
+    UAParser.HBBTV = enumerize([VERSION, VENDOR, MODEL, SOFTWARE, HARDWARE]);
 
     ///////////
     // Export
